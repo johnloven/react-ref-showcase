@@ -1,33 +1,56 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import React, { forwardRef, ReactElement, useRef } from "react";
 
-function App() {
-  const [count, setCount] = useState(0);
+// From Skapa
+function Focuser({ children }: { children: ReactElement }) {
+  const ref = useRef<HTMLInputElement>(null);
 
   return (
+    <div>
+      {React.cloneElement(children, { ref })}
+      <button onClick={() => ref.current?.focus()}>Focus</button>
+    </div>
+  );
+}
+
+// From Skapa
+const Input = forwardRef<HTMLInputElement>((_, ref) => {
+  return <input ref={ref} />;
+});
+
+function FixaFocuser({ children }: { children: ReactElement }) {
+  return <Focuser>{children}</Focuser>;
+}
+
+function FixaInputWithoutRef() {
+  return <Input />;
+}
+
+const FixaInputWithRef: React.FC = forwardRef<HTMLInputElement>((_, ref) => {
+  return <Input ref={ref} />;
+});
+
+function App() {
+  return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1>
+        React <code>forwardRef</code> showcase
+      </h1>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <h2>Using Skapa directly</h2>
+        <Focuser>
+          <Input />
+        </Focuser>
+        <h2>Using abstractions</h2>
+        <FixaFocuser>
+          <FixaInputWithRef />
+        </FixaFocuser>
+        <h2>
+          Using abstractions without forwarding ref to <code>Input</code>
+        </h2>
+        <FixaFocuser>
+          <FixaInputWithoutRef />
+        </FixaFocuser>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   );
 }
